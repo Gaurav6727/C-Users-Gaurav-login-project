@@ -1,70 +1,105 @@
-# Getting Started with Create React App
+# array-includes <sup>[![Version Badge][npm-version-svg]][package-url]</sup>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![github actions][actions-image]][actions-url]
+[![coverage][codecov-image]][codecov-url]
+[![dependency status][deps-svg]][deps-url]
+[![dev dependency status][dev-deps-svg]][dev-deps-url]
+[![License][license-image]][license-url]
+[![Downloads][downloads-image]][downloads-url]
 
-## Available Scripts
+[![npm badge][npm-badge-png]][package-url]
 
-In the project directory, you can run:
+An ES7/ES2016 spec-compliant `Array.prototype.includes` shim/polyfill/replacement that works as far down as ES3.
 
-### `npm start`
+This package implements the [es-shim API](https://github.com/es-shims/api) interface. It works in an ES3-supported environment and complies with the proposed [spec](https://262.ecma-international.org/6.0/).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Because `Array.prototype.includes` depends on a receiver (the `this` value), the main export takes the array to operate on as the first argument.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Engines that need this package include:
+ - IE (all versions)
+ - Safari < 9
+ - Firefox < 43, and 99-101
+ - Chrome < 47
+ - Edge < 14
+ - node < 6
 
-### `npm test`
+## Getting started
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```sh
+npm install --save array-includes
+```
 
-### `npm run build`
+## Usage
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Basic usage: **includes(array, value[, fromIndex=0])**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```js
+var includes = require('array-includes');
+var assert = require('assert');
+var arr = [ 'one', 'two' ];
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+includes(arr, 'one'); // true
+includes(arr, 'three'); // false
+includes(arr, 'one', 1); // false
+```
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Example
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```js
+var arr = [
+	1,
+	'foo',
+	NaN,
+	-0
+];
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+assert.equal(arr.indexOf(0) > -1, true);
+assert.equal(arr.indexOf(-0) > -1, true);
+assert.equal(includes(arr, 0), true);
+assert.equal(includes(arr, -0), true);
 
-## Learn More
+assert.equal(arr.indexOf(NaN) > -1, false);
+assert.equal(includes(arr, NaN), true);
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+assert.equal(includes(arr, 'foo', 0), true);
+assert.equal(includes(arr, 'foo', 1), true);
+assert.equal(includes(arr, 'foo', 2), false);
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```js
+/* when Array#includes is not present */
+delete Array.prototype.includes;
+var shimmedIncludes = includes.shim();
 
-### Code Splitting
+assert.equal(shimmedIncludes, includes.getPolyfill());
+assert.equal(arr.includes('foo', 1), includes(arr, 'foo', 1));
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```js
+/* when Array#includes is present */
+var shimmedIncludes = includes.shim();
 
-### Analyzing the Bundle Size
+assert.equal(shimmedIncludes, Array.prototype.includes);
+assert.equal(arr.includes(1, 'foo'), includes(arr, 1, 'foo'));
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Tests
+Simply clone the repo, `npm install`, and run `npm test`
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+[package-url]: https://npmjs.org/package/array-includes
+[npm-version-svg]: https://versionbadg.es/es-shims/array-includes.svg
+[deps-svg]: https://david-dm.org/es-shims/array-includes.svg
+[deps-url]: https://david-dm.org/es-shims/array-includes
+[dev-deps-svg]: https://david-dm.org/es-shims/array-includes/dev-status.svg
+[dev-deps-url]: https://david-dm.org/es-shims/array-includes#info=devDependencies
+[npm-badge-png]: https://nodei.co/npm/array-includes.png?downloads=true&stars=true
+[license-image]: https://img.shields.io/npm/l/array-includes.svg
+[license-url]: LICENSE
+[downloads-image]: https://img.shields.io/npm/dm/array-includes.svg
+[downloads-url]: https://npm-stat.com/charts.html?package=array-includes
+[codecov-image]: https://codecov.io/gh/es-shims/array-includes/branch/main/graphs/badge.svg
+[codecov-url]: https://app.codecov.io/gh/es-shims/array-includes/
+[actions-image]: https://img.shields.io/endpoint?url=https://github-actions-badge-u3jn4tfpocch.runkit.sh/es-shims/array-includes
+[actions-url]: https://github.com/es-shims/array-includes/actions
